@@ -25,6 +25,8 @@ jobs:
           else
             echo "PARAM_VALUE=en2" >> $GITHUB_ENV
           fi
+      - name: Checkout repository
+        uses: actions/checkout@v4
       - name: Announce deployment target
         run: echo "Deploying to ${{ github.event.inputs.target_environment }} environment"
       - name: Simulate deployment
@@ -32,3 +34,5 @@ jobs:
           echo "Starting deployment steps..."
           echo "Using parameter paramdis=${PARAM_VALUE}"
           echo "Completed deployment to ${{ github.event.inputs.target_environment }}"
+      - name: Run Python script
+        run: python run_py.py
