@@ -1,0 +1,34 @@
+name: Manual Environment Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: "Select the GitHub environment to deploy"
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+        default: dev
+
+jobs:
+  deploy:
+    name: Deploy to ${{ github.event.inputs.target_environment }}
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.target_environment }}
+    steps:
+      - name: Set deployment parameter
+        run: |
+          if [ "${{ github.event.inputs.target_environment }}" = "dev" ]; then
+            echo "PARAM_VALUE=en1" >> $GITHUB_ENV
+          else
+            echo "PARAM_VALUE=en2" >> $GITHUB_ENV
+          fi
+      - name: Announce deployment target
+        run: echo "Deploying to ${{ github.event.inputs.target_environment }} environment"
+      - name: Simulate deployment
+        run: |
+          echo "Starting deployment steps..."
+          echo "Using parameter paramdis=${PARAM_VALUE}"
+          echo "Completed deployment to ${{ github.event.inputs.target_environment }}"
