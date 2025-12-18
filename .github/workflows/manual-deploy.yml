@@ -18,7 +18,6 @@ on:
 
 jobs:
   deploy:
-    if: github.ref == 'refs/heads/main'
     name: Deploy to ${{ github.event.inputs.target_environment }}
     runs-on: ubuntu-latest
     environment: ${{ github.event.inputs.target_environment }}
