@@ -1,0 +1,48 @@
+name: deliver to dev and test
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: "Select the GitHub environment to deploy"
+        required: true
+        type: choice
+        options:
+          - dev
+          - test
+        default: dev
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+    prepare-actor-dev:
+        if: ${{ github.event.inputs.target_environment == 'dev' }}
+        runs-on: ubuntu-latest
+        outputs:
+            actor: ${{ steps.actor.outputs.actor}}
+        steps:
+            - name: Set actor output for dev
+              id: actor
+              run: |
+                ACTOR=$( echo '${{ github.actor }}' | sed 's/[^a-zA-Z0-9]//g' ) && echo "actor=$ACTOR" >> $GITHUB_OUTPUT
+                if [ '${{ github.ref }}' == 'refs/heads/main' ]; then ACTOR=''; fi && echo "actor=$ACTOR" >> $GITHUB_OUTPUT
+
+    dev:
+        needs: prepare-actor-dev
+        if : ${{ github.event.inputs.target_environment == 'dev' }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy to dev
+              run: "Deploying to dev environment with actor: ${{ needs.prepare-actor-dev.outputs.actor }}"
+    
+    test:
+        if : ${{ github.event.inputs.target_environment == 'test' }}
+        runs-on: ubuntu-latest
+        steps:
+            - name: Deploy to test
+              run: "Deploying to test environment with no actor"
