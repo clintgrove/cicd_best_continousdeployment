@@ -21,7 +21,7 @@ permissions:
 
 jobs:
     prepare-actor-dev:
-        if: ${{ github.event.inputs.target_environment == 'dev' }}
+        if: ${{ github.event_name == 'push' || github.event.inputs.target_environment == 'dev' }}
         runs-on: ubuntu-latest
         outputs:
             actor: ${{ steps.actor.outputs.actor}}
@@ -29,12 +29,15 @@ jobs:
             - name: Set actor output for dev
               id: actor
               run: |
-                ACTOR=$( echo '${{ github.actor }}' | sed 's/[^a-zA-Z0-9]//g' ) && echo "actor=$ACTOR" >> $GITHUB_OUTPUT
-                if [ '${{ github.ref }}' == 'refs/heads/main' ]; then ACTOR=''; fi && echo "actor=$ACTOR" >> $GITHUB_OUTPUT
+                ACTOR=""
+                if [ '${{ github.event_name }}' == 'workflow_dispatch' ] && [ '${{ github.ref }}' != 'refs/heads/main' ]; then
+                  ACTOR=$( echo '${{ github.actor }}' | sed 's/[^a-zA-Z0-9]//g' )
+                fi
+                echo "actor=$ACTOR" >> $GITHUB_OUTPUT
 
     dev:
         needs: prepare-actor-dev
-        if : ${{ github.event.inputs.target_environment == 'dev' }}
+        if: ${{ github.event_name == 'push' || github.event.inputs.target_environment == 'dev' }}
         runs-on: ubuntu-latest
         steps:
             - name: Deploy to dev
@@ -42,7 +45,7 @@ jobs:
                 echo "Deploying to dev environment with actor: ${{ needs.prepare-actor-dev.outputs.actor }}"
     
     test:
-        if : ${{ github.event.inputs.target_environment == 'test' }}
+        if: ${{ github.event.inputs.target_environment == 'test' }}
         runs-on: ubuntu-latest
         steps:
             - name: Deploy to test
