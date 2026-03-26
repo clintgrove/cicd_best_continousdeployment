@@ -37,7 +37,8 @@ jobs:
 
     dev:
         needs: prepare-actor-dev
-        if: ${{ github.event_name == 'push' || github.event.inputs.target_environment == 'dev' }}
+        # if: ${{ github.event_name == 'push' || github.event.inputs.target_environment == 'dev' }}
+        if: ${{ github.ref == 'refs/heads/main' || github.event.inputs.target_environment == 'dev' }}
         runs-on: ubuntu-latest
         steps:
             - name: Deploy to dev
