@@ -38,11 +38,11 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Deploy to dev
-              run: "Deploying to dev environment with actor: ${{ needs.prepare-actor-dev.outputs.actor }}"
+              run: echo "Deploying to dev environment with actor: ${{ needs.prepare-actor-dev.outputs.actor }}"
     
     test:
         if : ${{ github.event.inputs.target_environment == 'test' }}
         runs-on: ubuntu-latest
         steps:
             - name: Deploy to test
-              run: "Deploying to test environment with no actor"
+              run: echo "Deploying to test environment with no actor"
